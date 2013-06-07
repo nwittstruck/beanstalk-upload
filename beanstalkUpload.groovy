@@ -1,6 +1,6 @@
 @GrabResolver(name='central', root='http://repo1.maven.org/maven2')
 @GrabResolver(name='javanet', root='http://download.java.net/maven/2')
-@Grab(group='com.amazonaws', module='aws-java-sdk', version='1.1.6')
+@Grab(group='com.amazonaws', module='aws-java-sdk', version='1.4.5')
 @Grab(group='commons-logging', module='commons-logging', version='1.1.1')
 @Grab(group='commons-codec', module='commons-codec', version='1.4')
 @Grab(group='commons-httpclient', module='commons-httpclient', version='3.1')
@@ -51,7 +51,7 @@ void upload(appName, appVersion, fileToUpload) {
 	
 	def s3client = new AmazonS3Client(credentials) 
 	def bucketName = "${appName}-${UUID.randomUUID()}"
-    
+    s3client.setEndpoint("s3-eu-west-1.amazonaws.com")
 	log(appName, "Creating s3 bucket '${bucketName}' to hold application file")
 	def bucket = s3client.createBucket(bucketName)
 	
@@ -78,8 +78,9 @@ void upload(appName, appVersion, fileToUpload) {
 	}
 			
 	def beanstalk = new AWSElasticBeanstalkClient(credentials)
+    beanstalk.setEndpoint("elasticbeanstalk.eu-west-1.amazonaws.com")
 	def applicationVersionRequest = new CreateApplicationVersionRequest(appName, appVersion)
-	applicationVersionRequest.setAutoCreateApplication(true)
+	applicationVersionRequest.setAutoCreateApplication(false)
 	applicationVersionRequest.setSourceBundle(new S3Location(bucketName, objectKey))
 	
 	println ""
